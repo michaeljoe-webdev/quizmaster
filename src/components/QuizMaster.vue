@@ -6,7 +6,7 @@
       <div class="toolbar" >
         <span>
           Number of questions: 
-          <input type="number" v-model="amount" maxlength="2" min="1" max="50">
+          <input type="number" v-model="amount" min="1" max="50">
         </span>
         <span>
           Category: 
@@ -32,7 +32,7 @@
       </div>
       <div class="loader" v-if="loading"></div>
       <div v-if="questions" class="card">
-        <div v-html="content"></div>
+        <div v-html="content" class="table"></div>
         <!-- <table id="questions" v-if="questions" > 
           <div class="questionBox" v-if="questions[editedIndex].choices.length == 2">
             <tr>
@@ -77,7 +77,7 @@
         </table> -->
       </div>
       <div class="nextbtn" v-if="questions">
-        <button @click="nextQuestion()">NEXT >></button>
+        <button @click="nextQuestion()" :disabled="(questions.length - 1) == editedIndex">NEXT >></button>
       </div>
           {{ questions.category }}
           {{ questions.difficulty }}
@@ -111,20 +111,17 @@ export default {
         ],
         questions: '',
         answer: '',
-        editedIndex: '0',
+        editedIndex: 0,
         content: ``,
         loading: false,
     }
   },
   methods: {
     nextQuestion(){
-      // const itemGrid = document.getElementById('itemGrid');
-      // itemGrid.innerHTML = ''; // Clear previous content
-    
-      // for (let i = 0; i < this.questions.length; i++) {
-      //   this.content = ``
-      // }
       this.editedIndex = this.editedIndex + 1
+      console.log('array',this.questions,'index',this.editedIndex)
+      this.createContent()     
+      console.log('this.content',this.content) 
     },
 
     test(){
@@ -133,6 +130,7 @@ export default {
       // console.log('test',document.getElementsByName("answer")[0].value)
       console.log('form',form)
     },  
+
     async allSet(){
       this.loading = true
         if(this.amount >= 51){
@@ -150,55 +148,13 @@ export default {
                 tempArray.push(item2)
               })
 
-              item.choices = this.shuffle(tempArray)
+              item.choices = item.incorrect_answers.length > 2 ? this.shuffle(tempArray) : ['True', 'False']
               return item
             })
 
             this.questions = newArray
-            this.content = `
-            <table id="questions" v-if="questions" > 
-              <div class="questionBox" v-if="questions[editedIndex].choices.length == 2">
-                <tr>
-                  <th colspan="12">QUESTION ${this.editedIndex + 1} : {{ formattedQuestion(questions[editedIndex].question) }}</th>
-                </tr>
-                <tr>
-                  <td colspan="6"> 
-                    <input type="radio" id="answerA" v-model="answer" :value="questions[editedIndex].choices[0]">
-                    <label for="answerA">A. {{ formattedQuestion(questions[editedIndex].choices[0]) }}</label>
-                  </td>
-                  <td colspan="6">
-                    <input type="radio" id="answerB" v-model="answer" :value="questions[editedIndex].choices[1]">
-                    <label for="answerB">B. {{ formattedQuestion(questions[editedIndex].choices[1]) }}</label>
-                  </td>
-                </tr>
-              </div>
-              <div class="questionBox" v-if="questions[editedIndex].choices.length > 2">
-                <tr>
-                  <th colspan="12">QUESTION {{ editedIndex + 1 }} : {{ formattedQuestion(questions[editedIndex].question) }}</th>
-                </tr>
-                <tr>
-                  <td colspan="6"> 
-                    <input type="radio" id="answerA" v-model="answer" :value="questions[editedIndex].choices[0]">
-                    <label for="answerA">A. {{ formattedQuestion(questions[editedIndex].choices[0]) }}</label>
-                  </td>
-                  <td colspan="6">
-                    <input type="radio" id="answerB" v-model="answer" :value="questions[editedIndex].choices[1]">
-                    <label for="answerB">B. {{ formattedQuestion(questions[editedIndex].choices[1]) }}</label>
-                  </td>
-                </tr>
-                <tr>
-                  <td colspan="6"> 
-                    <input type="radio" id="answerC" v-model="answer" :value="questions[editedIndex].choices[2]">
-                    <label for="answerC">C. {{formattedQuestion(questions[editedIndex].choices[2]) }}</label>
-                  </td>
-                  <td colspan="6">
-                    <input type="radio" id="answerD" v-model="answer" :value="questions[editedIndex].choices[3]">
-                    <label for="answerD">D. {{ formattedQuestion(questions[editedIndex].choices[3]) }}</label>
-                  </td>
-                </tr>
-              </div>
-            </table>
-            `
+            this.createContent()
+
           })
           .catch((err)=>{
             console.log('Too many request',err.code)
@@ -210,6 +166,60 @@ export default {
         this.loading = false
 
     },  
+
+    createContent(){
+      if(this.questions[this.editedIndex].choices.length == 2){
+        this.content = `
+          <center>
+          <table> 
+              <tr>
+                <th colspan="12" style="border: 1px solid black; height: 20%;">QUESTION ${this.editedIndex + 1} : ${this.formattedQuestion(this.questions[this.editedIndex].question)}</th>
+              </tr>
+              <tr>
+                <td colspan="6" style=" border: 1px solid black"> 
+                  <input type="radio" id="answerA" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[0]}">
+                  <label for="answerA"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[0]) } </label>
+                </td>
+                <td colspan="6" style=" border: 1px solid black">
+                  <input type="radio" id="answerB" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[1]}">
+                  <label for="answerB"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[1]) } </label>
+                </td>
+              </tr>
+          </table>
+        </center>
+          `
+      }else if(this.questions[this.editedIndex].choices.length > 2){
+        this.content = `
+          <center>
+          <table> 
+              <tr>
+                <th colspan="12" style="border: 1px solid black; height: 20%;">QUESTION ${this.editedIndex + 1} : ${this.formattedQuestion(this.questions[this.editedIndex].question)}</th>
+              </tr>
+              <tr>
+                <td colspan="6" style=" border: 1px solid black"> 
+                  <input type="radio" id="answerA" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[0]}">
+                  <label for="answerA"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[0]) } </label>
+                </td>
+                <td colspan="6" style=" border: 1px solid black">
+                  <input type="radio" id="answerB" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[1]}">
+                  <label for="answerB"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[1]) } </label>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="6" style=" border: 1px solid black"> 
+                  <input type="radio" id="answerC" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[2]}">
+                  <label for="answerC"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[2]) } </label>
+                </td>
+                <td colspan="6" style=" border: 1px solid black">
+                  <input type="radio" id="answerD" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[3]}">
+                  <label for="answerD"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[3]) } </label>
+                </td>
+              </tr>
+          </table>
+        </center>
+          `
+      }
+    },
     shuffle(array) {
       let currentIndex = array.length,  randomIndex;
 
@@ -300,13 +310,14 @@ span {
   margin: 5px 5% 5px;
   border: 1px solid blue;
 }
-table {
-  height: 100%;
-  width: 100%;
+/* TABLE */
+.table {
+  height: 220px;
   text-align: center;
   align-items: center;
   align-content: center;
   border: 1px solid yellowgreen;
+  margin: 10px;
 }
 .questionBox {
   margin: 5px 10%;
@@ -314,22 +325,7 @@ table {
   border: 1px solid red;
 
 }
-tr {
-  text-align: center;
-  align-items: center;
-  align-content: center;
-  margin: 5px 5% 5px;
-  /* border: 1px solid red; */
-  /* width: 50%; */
-}
-th {
-  border: 1px solid black;
-  height: 20%;
-  /* width: 100%; */
-}
-td {
-  border: 1px solid black;
-}
+
 .loader {
   border: 16px solid #f3f3f3;
   border-radius: 50%;
