@@ -30,64 +30,55 @@
       <div class="setbtn">
         <button @click="allSet()">ALL SET!</button>
       </div>
-      <div class="card">
-          <!-- {{ questions }} -->
-          <!-- <div class="question-box" v-for="(item,i) in questions" :key="i" > -->
-          <!-- <div class="question-box"> -->
-            <!-- <table v-for="(item,i) in questions" :key="i" >
-              <tr>
-                <th colspan="12">QUESTION {{ i + 1 }} : {{ formattedQuestion(item.question) }}</th>
-              </tr>
-              <tr>
-                <td colspan="6"> 
-                  <input type="radio" id="answerA" v-model="answer" :value="item.choices[0]">
-                  <label for="answerA">A. {{ formattedQuestion(item.choices[0]) }}</label>
-                </td>
-                <td colspan="6">
-                  <input type="radio" id="answerB" v-model="answer" :value="item.choices[1]">
-                  <label for="answerB">B. {{ formattedQuestion(item.choices[1]) }}</label>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="6"> 
-                  <input type="radio" id="answerC" v-model="answer" :value="item.choices[2]">
-                  <label for="answerC">C. {{formattedQuestion(item.choices[2]) }}</label>
-                </td>
-                <td colspan="6">
-                  <input type="radio" id="answerD" v-model="answer" :value="item.choices[3]">
-                  <label for="answerD">D. {{ formattedQuestion(item.choices[3]) }}</label>
-                </td>
-              </tr>
-            </table> -->
-            <table >
-              <tr>
-                <th colspan="12">QUESTION {{ index + 1 }} : {{ formattedQuestion(questions[index + 1].question) }}</th>
-              </tr>
-              <tr>
-                <td colspan="6"> 
-                  <input type="radio" id="answerA" v-model="answer" :value="questions[index + 1].choices[0]">
-                  <label for="answerA">A. {{ formattedQuestion(questions[index + 1].choices[0]) }}</label>
-                </td>
-                <td colspan="6">
-                  <input type="radio" id="answerB" v-model="answer" :value="questions[index + 1].choices[1]">
-                  <label for="answerB">B. {{ formattedQuestion(questions[index + 1].choices[1]) }}</label>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="6"> 
-                  <input type="radio" id="answerC" v-model="answer" :value="questions[index + 1].choices[2]">
-                  <label for="answerC">C. {{formattedQuestion(questions[index + 1].choices[2]) }}</label>
-                </td>
-                <td colspan="6">
-                  <input type="radio" id="answerD" v-model="answer" :value="questions[index + 1].choices[3]">
-                  <label for="answerD">D. {{ formattedQuestion(questions[index + 1].choices[3]) }}</label>
-                </td>
-              </tr>
-            </table>
+      <div class="loader" v-if="loading"></div>
+      <div v-if="questions" class="card">
+        <div v-html="content"></div>
+        <!-- <table id="questions" v-if="questions" > 
+          <div class="questionBox" v-if="questions[editedIndex].choices.length == 2">
+            <tr>
+              <th colspan="12">QUESTION {{ editedIndex + 1 }} : {{ formattedQuestion(questions[editedIndex].question) }}</th>
+            </tr>
+            <tr>
+              <td colspan="6"> 
+                <input type="radio" id="answerA" v-model="answer" :value="questions[editedIndex].choices[0]">
+                <label for="answerA">A. {{ formattedQuestion(questions[editedIndex].choices[0]) }}</label>
+              </td>
+              <td colspan="6">
+                <input type="radio" id="answerB" v-model="answer" :value="questions[editedIndex].choices[1]">
+                <label for="answerB">B. {{ formattedQuestion(questions[editedIndex].choices[1]) }}</label>
+              </td>
+            </tr>
           </div>
-          <div class="nextbtn">
-            <button @click="allSet()">NEXT >></button>
+          <div class="questionBox" v-if="questions[editedIndex].choices.length > 2">
+            <tr>
+              <th colspan="12">QUESTION {{ editedIndex + 1 }} : {{ formattedQuestion(questions[editedIndex].question) }}</th>
+            </tr>
+            <tr>
+              <td colspan="6"> 
+                <input type="radio" id="answerA" v-model="answer" :value="questions[editedIndex].choices[0]">
+                <label for="answerA">A. {{ formattedQuestion(questions[editedIndex].choices[0]) }}</label>
+              </td>
+              <td colspan="6">
+                <input type="radio" id="answerB" v-model="answer" :value="questions[editedIndex].choices[1]">
+                <label for="answerB">B. {{ formattedQuestion(questions[editedIndex].choices[1]) }}</label>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="6"> 
+                <input type="radio" id="answerC" v-model="answer" :value="questions[editedIndex].choices[2]">
+                <label for="answerC">C. {{formattedQuestion(questions[editedIndex].choices[2]) }}</label>
+              </td>
+              <td colspan="6">
+                <input type="radio" id="answerD" v-model="answer" :value="questions[editedIndex].choices[3]">
+                <label for="answerD">D. {{ formattedQuestion(questions[editedIndex].choices[3]) }}</label>
+              </td>
+            </tr>
           </div>
+        </table> -->
+      </div>
+      <div class="nextbtn" v-if="questions">
+        <button @click="nextQuestion()">NEXT >></button>
+      </div>
           {{ questions.category }}
           {{ questions.difficulty }}
 
@@ -120,13 +111,22 @@ export default {
         ],
         questions: '',
         answer: '',
-        index: '-1',
+        editedIndex: '0',
+        content: ``,
+        loading: false,
     }
   },
   methods: {
-    formattedQuestion(string) {
-      return string.replaceAll('&ldquo;', '"').replaceAll('&rdquo;', '"').replaceAll('&quot;', '"').replaceAll('&#039;', "'").replaceAll('&rsquo;', "'").replaceAll('&lsquo;', "'").replaceAll('&shy;', '').replaceAll('&hellip;', '…');
+    nextQuestion(){
+      // const itemGrid = document.getElementById('itemGrid');
+      // itemGrid.innerHTML = ''; // Clear previous content
+    
+      // for (let i = 0; i < this.questions.length; i++) {
+      //   this.content = ``
+      // }
+      this.editedIndex = this.editedIndex + 1
     },
+
     test(){
       var form = document.getElementById('form');
       form.addEventListener('submit');
@@ -134,11 +134,13 @@ export default {
       console.log('form',form)
     },  
     async allSet(){
+      this.loading = true
         if(this.amount >= 51){
           alert('Number of questions exceed the limit 50')
         }else if(!this.amount || !this.category || !this.difficulty || !this.type){
           alert('Please complete all fields!')
         }else{
+          this.questions = ''
           await axios.get(`https://opentdb.com/api.php?amount=${this.amount}&category=${this.category}&difficulty=${this.difficulty}&type=${this.type}`)
           .then(async (res) => {
             let newArray = await res.data.results.filter((item)=>{
@@ -153,9 +155,60 @@ export default {
             })
 
             this.questions = newArray
+            this.content = `
+            <table id="questions" v-if="questions" > 
+              <div class="questionBox" v-if="questions[editedIndex].choices.length == 2">
+                <tr>
+                  <th colspan="12">QUESTION ${this.editedIndex + 1} : {{ formattedQuestion(questions[editedIndex].question) }}</th>
+                </tr>
+                <tr>
+                  <td colspan="6"> 
+                    <input type="radio" id="answerA" v-model="answer" :value="questions[editedIndex].choices[0]">
+                    <label for="answerA">A. {{ formattedQuestion(questions[editedIndex].choices[0]) }}</label>
+                  </td>
+                  <td colspan="6">
+                    <input type="radio" id="answerB" v-model="answer" :value="questions[editedIndex].choices[1]">
+                    <label for="answerB">B. {{ formattedQuestion(questions[editedIndex].choices[1]) }}</label>
+                  </td>
+                </tr>
+              </div>
+              <div class="questionBox" v-if="questions[editedIndex].choices.length > 2">
+                <tr>
+                  <th colspan="12">QUESTION {{ editedIndex + 1 }} : {{ formattedQuestion(questions[editedIndex].question) }}</th>
+                </tr>
+                <tr>
+                  <td colspan="6"> 
+                    <input type="radio" id="answerA" v-model="answer" :value="questions[editedIndex].choices[0]">
+                    <label for="answerA">A. {{ formattedQuestion(questions[editedIndex].choices[0]) }}</label>
+                  </td>
+                  <td colspan="6">
+                    <input type="radio" id="answerB" v-model="answer" :value="questions[editedIndex].choices[1]">
+                    <label for="answerB">B. {{ formattedQuestion(questions[editedIndex].choices[1]) }}</label>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="6"> 
+                    <input type="radio" id="answerC" v-model="answer" :value="questions[editedIndex].choices[2]">
+                    <label for="answerC">C. {{formattedQuestion(questions[editedIndex].choices[2]) }}</label>
+                  </td>
+                  <td colspan="6">
+                    <input type="radio" id="answerD" v-model="answer" :value="questions[editedIndex].choices[3]">
+                    <label for="answerD">D. {{ formattedQuestion(questions[editedIndex].choices[3]) }}</label>
+                  </td>
+                </tr>
+              </div>
+            </table>
+            `
+          })
+          .catch((err)=>{
+            console.log('Too many request',err.code)
+            alert('SERVER ERROR: Too many request, please try again')
+
           })
         }
         // console.log(this.questions)
+        this.loading = false
+
     },  
     shuffle(array) {
       let currentIndex = array.length,  randomIndex;
@@ -187,6 +240,9 @@ export default {
     },
     getLsData(name){
       return JSON.parse(localStorage.getItem(name));
+    },
+    formattedQuestion(string) {
+      return string.replaceAll('&ldquo;', '"').replaceAll('&rdquo;', '"').replaceAll('&quot;', '"').replaceAll('&#039;', "'").replaceAll('&rsquo;', "'").replaceAll('&lsquo;', "'").replaceAll('&shy;', '').replaceAll('&hellip;', '…');
     },
   },
   mounted() {
@@ -231,7 +287,7 @@ span {
   margin: 5px;
 }
 .card {
-    height: 500px;
+    height: 250px;
     border:1px solid red;
 }
 .setbtn {
@@ -243,19 +299,56 @@ span {
 .nextbtn {
   margin: 5px 5% 5px;
   border: 1px solid blue;
-
-  
 }
 table {
   height: 100%;
   width: 100%;
+  text-align: center;
+  align-items: center;
+  align-content: center;
+  border: 1px solid yellowgreen;
+}
+.questionBox {
+  margin: 5px 10%;
+  width: 80%;
+  border: 1px solid red;
+
+}
+tr {
+  text-align: center;
+  align-items: center;
+  align-content: center;
+  margin: 5px 5% 5px;
+  /* border: 1px solid red; */
+  /* width: 50%; */
 }
 th {
   border: 1px solid black;
   height: 20%;
-  width: 100%;
+  /* width: 100%; */
 }
 td {
   border: 1px solid black;
+}
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  margin: auto;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 </style>
