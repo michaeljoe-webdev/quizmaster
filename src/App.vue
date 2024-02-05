@@ -1,18 +1,18 @@
 <template>
   <img alt="Quiz Master logo" src="./assets/qm-logo.png" height="150px">
-  <WelcomePage msg="Welcome to Quiz Master!"/>
+  <QuizMaster msg="Welcome to Quiz Master!"/>
   <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
 
 </template>
 
 <script>
-import WelcomePage from './components/WelcomePage.vue';
+import QuizMaster from './components/QuizMaster.vue';
 // import HelloWorld from './components/HelloWorld.vue'
 
 export default {
   name: 'App',
   components: {
-    WelcomePage,
+    QuizMaster,
     // HelloWorld
   }
 }
@@ -25,6 +25,5 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>
