@@ -32,57 +32,46 @@
       </div>
       <div class="loader" v-if="loading"></div>
       <div v-if="questions" class="card">
-        <div v-html="content" class="table"></div>
-        <!-- <table id="questions" v-if="questions" > 
-          <div class="questionBox" v-if="questions[editedIndex].choices.length == 2">
-            <tr>
-              <th colspan="12">QUESTION {{ editedIndex + 1 }} : {{ formattedQuestion(questions[editedIndex].question) }}</th>
-            </tr>
-            <tr>
-              <td colspan="6"> 
-                <input type="radio" id="answerA" v-model="answer" :value="questions[editedIndex].choices[0]">
-                <label for="answerA">A. {{ formattedQuestion(questions[editedIndex].choices[0]) }}</label>
-              </td>
-              <td colspan="6">
-                <input type="radio" id="answerB" v-model="answer" :value="questions[editedIndex].choices[1]">
-                <label for="answerB">B. {{ formattedQuestion(questions[editedIndex].choices[1]) }}</label>
-              </td>
-            </tr>
+        <center>
+          <table v-if="questions && questions.length > editedIndex"> 
+              <tr>
+                <th colspan="12" style="border: 1px solid black;text-align: center; height: 95px; flex-wrap: wrap;">QUESTION {{editedIndex + 1}} : {{ formattedQuestion(questions[editedIndex].question) }}</th>
+              </tr>
+              <tr>
+                <td colspan="6" style=" border: 1px solid black; height: 30px; flex-wrap: wrap;"> 
+                  <input type="radio" id="answerA" v-model="answer" name="answer" :value="questions[editedIndex].choices[0]">
+                  <label for="answerA"> <a v-if="questions[editedIndex].choices.length > 2">A.</a> {{ formattedQuestion(questions[editedIndex].choices[0]) }} </label>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="6" style=" border: 1px solid black; height: 30px; flex-wrap: wrap;">
+                  <input type="radio" id="answerB" v-model="answer" name="answer" :value="questions[editedIndex].choices[1]">
+                  <label for="answerB"> <a v-if="questions[editedIndex].choices.length > 2">B.</a> {{ formattedQuestion(questions[editedIndex].choices[1]) }} </label>
+                </td>
+              </tr>
+              <tr v-if="questions[editedIndex].choices.length > 2">
+                <td colspan="6" style=" border: 1px solid black; height: 30px; flex-wrap: wrap;"> 
+                  <input type="radio" id="answerC" v-model="answer" name="answer" :value="questions[editedIndex].choices[2]">
+                  <label for="answerC"> <a>C.</a> {{ formattedQuestion(questions[editedIndex].choices[2]) }} </label>
+                </td>
+              </tr>
+              <tr v-if="questions[editedIndex].choices.length > 2">
+                <td colspan="6" style=" border: 1px solid black; height: 30px; flex-wrap: wrap;">
+                  <input type="radio" id="answerD" v-model="answer" name="answer" :value="questions[editedIndex].choices[3]">
+                  <label for="answerC"> <a>D.</a> {{ formattedQuestion(questions[editedIndex].choices[3]) }} </label>
+                </td>
+              </tr>
+          </table>
+          <div v-if="questions.length == editedIndex">
+            <h3>Your Score:</h3>
+            <h1>{{ score }} / {{ questions.length }}</h1>
           </div>
-          <div class="questionBox" v-if="questions[editedIndex].choices.length > 2">
-            <tr>
-              <th colspan="12">QUESTION {{ editedIndex + 1 }} : {{ formattedQuestion(questions[editedIndex].question) }}</th>
-            </tr>
-            <tr>
-              <td colspan="6"> 
-                <input type="radio" id="answerA" v-model="answer" :value="questions[editedIndex].choices[0]">
-                <label for="answerA">A. {{ formattedQuestion(questions[editedIndex].choices[0]) }}</label>
-              </td>
-              <td colspan="6">
-                <input type="radio" id="answerB" v-model="answer" :value="questions[editedIndex].choices[1]">
-                <label for="answerB">B. {{ formattedQuestion(questions[editedIndex].choices[1]) }}</label>
-              </td>
-            </tr>
-            <tr>
-              <td colspan="6"> 
-                <input type="radio" id="answerC" v-model="answer" :value="questions[editedIndex].choices[2]">
-                <label for="answerC">C. {{formattedQuestion(questions[editedIndex].choices[2]) }}</label>
-              </td>
-              <td colspan="6">
-                <input type="radio" id="answerD" v-model="answer" :value="questions[editedIndex].choices[3]">
-                <label for="answerD">D. {{ formattedQuestion(questions[editedIndex].choices[3]) }}</label>
-              </td>
-            </tr>
-          </div>
-        </table> -->
+        </center>
       </div>
       <div class="nextbtn" v-if="questions">
-        <button @click="nextQuestion()" :disabled="(questions.length - 1) == editedIndex">NEXT >></button>
+        <button @click="nextQuestion()" v-if="questions.length > editedIndex">NEXT >></button>
+        <!-- <button @click="checkResult()" v-if="questions.length == editedIndex">CHECK RESULT</button> -->
       </div>
-          {{ questions.category }}
-          {{ questions.difficulty }}
-
-      <!-- </div> -->
     </div>
 <!-- https://opentdb.com/api.php?amount=10&category=9&difficulty=easy&type=multiple -->
 <!-- https://opentdb.com/api.php?amount=10&category=27&difficulty=medium&type=boolean -->
@@ -114,14 +103,37 @@ export default {
         editedIndex: 0,
         content: ``,
         loading: false,
+        score: '',
     }
   },
   methods: {
+    checkResult(){
+      console.log('check')
+        let results = this.questions.filter(res=> res.correct_answer == res.user_answer)
+        // console.log('results',results.length)
+        this.score = results.length
+        // console.log('this.score',this.score)
+    },
     nextQuestion(){
-      this.editedIndex = this.editedIndex + 1
-      console.log('array',this.questions,'index',this.editedIndex)
-      this.createContent()     
-      console.log('this.content',this.content) 
+      if(this.questions.length >= this.editedIndex){
+        this.questions[this.editedIndex].user_answer = this.answer
+        this.editedIndex = this.editedIndex + 1
+        if(this.questions.length == this.editedIndex){
+          //exclude
+          this.content = ''
+          this.answer = ''
+          this.checkResult()
+          return false
+        }else{
+          this.createContent()     
+          this.answer = ''
+        }
+      }else if(this.questions.length == this.editedIndex){
+        //exclude
+        this.editedIndex = this.editedIndex + 1
+        this.answer = ''
+        return false
+      }
     },
 
     test(){
@@ -133,6 +145,10 @@ export default {
 
     async allSet(){
       this.loading = true
+      this.questions = ''
+      this.score = ''
+      this.editedIndex = 0
+      this.answer = ''
         if(this.amount >= 51){
           alert('Number of questions exceed the limit 50')
         }else if(!this.amount || !this.category || !this.difficulty || !this.type){
@@ -158,7 +174,7 @@ export default {
           })
           .catch((err)=>{
             console.log('Too many request',err.code)
-            alert('SERVER ERROR: Too many request, please try again')
+            alert('SERVER ERROR: Too many request, refesh the page and please try again')
 
           })
         }
@@ -166,7 +182,10 @@ export default {
         this.loading = false
 
     },  
-
+    handleRadioChange(event) {
+      console.log('event',event,'answer',this.answer)
+      this.answer = event;
+    },
     createContent(){
       if(this.questions[this.editedIndex].choices.length == 2){
         this.content = `
@@ -193,7 +212,7 @@ export default {
           <center>
           <table> 
               <tr>
-                <th colspan="12" style="border: 1px solid black; height: 20%;">QUESTION ${this.editedIndex + 1} : ${this.formattedQuestion(this.questions[this.editedIndex].question)}</th>
+                <th colspan="12" style="border: 1px solid black; height: auto;">QUESTION ${this.editedIndex + 1} : ${this.formattedQuestion(this.questions[this.editedIndex].question)}</th>
               </tr>
               <tr>
                 <td colspan="6" style=" border: 1px solid black"> 
