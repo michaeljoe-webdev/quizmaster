@@ -1,19 +1,19 @@
 <template>
   <img alt="Quiz Master logo" src="./assets/qm-logo.png" height="150px">
   <QuizMaster msg="Welcome to Quiz Master!"/>
-  <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
+  <!-- <CongratsAnimation/> -->
 
 </template>
 
 <script>
 import QuizMaster from './components/QuizMaster.vue';
-// import HelloWorld from './components/HelloWorld.vue'
+// import CongratsAnimation from './components/CongratsAnimation.vue'
 
 export default {
   name: 'App',
   components: {
     QuizMaster,
-    // HelloWorld
+    // CongratsAnimation
   }
 }
 </script>
