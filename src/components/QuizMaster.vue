@@ -28,12 +28,13 @@
         </span>
       </div>
       <div class="setbtn">
-        <button @click="allSet()">ALL SET!</button>
+        <button @click="allSet()" v-if="results == false">ALL SET!</button>
+        <button @click="allSet()" v-if="results == true">TRY AGAIN!</button>
       </div>
       <div class="loader" v-if="loading"></div>
       <div v-if="questions" class="card">
         <center>
-          <table v-if="questions && questions.length > editedIndex"> 
+          <table v-if="questions && questions.length > editedIndex && results == false"> 
               <tr>
                 <th colspan="12" style="border: 1px solid black;text-align: center; height: 95px;">QUESTION {{editedIndex + 1}} : {{ formattedQuestion(questions[editedIndex].question) }}</th>
               </tr>
@@ -62,89 +63,14 @@
                 </td>
               </tr>
           </table>
-          <div v-if="questions.length == editedIndex" class="score">
-              <!-- <Particles
-                  id="tsparticles"
-                  :particlesInit="particlesInit"
-                  :particlesLoaded="particlesLoaded"
-                  :options="{
-                          background: {
-                              color: {
-                                  value: '#0d47a1'
-                              }
-                          },
-                          fpsLimit: 120,
-                          interactivity: {
-                              events: {
-                                  onClick: {
-                                      enable: true,
-                                      mode: 'push'
-                                  },
-                                  onHover: {
-                                      enable: true,
-                                      mode: 'repulse'
-                                  },
-                                  resize: true
-                              },
-                              modes: {
-                                  bubble: {
-                                      distance: 400,
-                                      duration: 2,
-                                      opacity: 0.8,
-                                      size: 40
-                                  },
-                                  push: {
-                                      quantity: 4
-                                  },
-                                  repulse: {
-                                      distance: 200,
-                                      duration: 0.4
-                                  }
-                              }
-                          },
-                          particles: {
-                              color: {
-                                  value: '#ffffff'
-                              },
-                              links: {
-                                  color: '#ffffff',
-                                  distance: 150,
-                                  enable: true,
-                                  opacity: 0.5,
-                                  width: 1
-                              },
-                              collisions: {
-                                  enable: true
-                              },
-                              move: {
-                                  direction: 'none',
-                                  enable: true,
-                                  outMode: 'bounce',
-                                  random: false,
-                                  speed: 6,
-                                  straight: false
-                              },
-                              number: {
-                                  density: {
-                                      enable: true,
-                                      area: 800
-                                  },
-                                  value: 80
-                              },
-                              opacity: {
-                                  value: 0.5
-                              },
-                              shape: {
-                                  type: 'circle'
-                              },
-                              size: {
-                                  random: true,
-                                  value: 5
-                              }
-                          },
-                          detectRetina: true
-                      }"
-              /> -->
+          <table v-if="results == true"> 
+              <tr v-for="(item,i) in questions" :key="i">
+                <th colspan="12" style="border: 1px solid black;text-align: center; height: 95px;">QUESTION {{i + 1}} : {{ formattedQuestion(item.question) }}</th>
+                <td colspan="6" style=" border: 1px solid black; height: 30px; flex-wrap: wrap;">Correct Answer : {{ formattedQuestion(item.correct_answer) }}</td>
+                <td colspan="6" style=" border: 1px solid black; height: 30px; flex-wrap: wrap;">Your Answer : {{ formattedQuestion(item.user_answer) }}</td>
+              </tr>
+          </table>
+          <div v-if="questions.length == editedIndex && results == false" class="score">
             <h3>Your Score:</h3>
             <h1>{{ score }} / {{ questions.length }}</h1>
           </div>
@@ -152,7 +78,7 @@
       </div>
       <div class="nextbtn" v-if="questions">
         <button @click="nextQuestion()" v-if="questions.length > editedIndex">NEXT >></button>
-        <!-- <button @click="checkResult()" v-if="questions.length == editedIndex">CHECK RESULT</button> -->
+        <button @click="checkResult()" v-if="questions.length == editedIndex && results == false">CHECK RESULT</button>
       </div>
     </div>
 <!-- https://opentdb.com/api.php?amount=10&category=9&difficulty=easy&type=multiple -->
@@ -160,18 +86,6 @@
 </template>
 <script>
 import axios from 'axios';
-// import VueConfetti from 'vue-confetti';
-// import { loadFull } from "tsparticles"; // if you are going to use `loadFull`, install the "tsparticles" package too.
-// import { loadSlim } from "tsparticles-slim"; // if you are going to use `loadSlim`, install the "tsparticles-slim" package too.
-// this.particlesInit = async engine => {
-//     await loadFull(engine);
-//     // await loadSlim(engine);
-// };
-
-// this.particlesLoaded = async container => {
-//     console.log("Particles container loaded", container);
-// };
-
 export default {
   name: 'QuizMaster',
   props: {
@@ -200,32 +114,12 @@ export default {
         score: '',
         particlesInit: '',
         particlesLoaded: '',
+        results: false,
     }
   },
   methods: {
-    // async particlesInitengine(engine){
-    //     await loadFull(engine);
-    //     // await loadSlim(engine);
-    // },
-    // async particlesLoaded(container){
-    //     console.log("Particles container loaded", container);
-    // },
-    // forMount(){
-    //   this.particlesInit = async engine => {
-    //       await loadFull(engine);
-    //       // await loadSlim(engine);
-    //   };
-
-    //   this.particlesLoaded = async container => {
-    //       console.log("Particles container loaded", container);
-    //   };
-    // },
     checkResult(){
-      console.log('check')
-        let results = this.questions.filter(res=> res.correct_answer == res.user_answer)
-        // console.log('results',results.length)
-        this.score = results.length
-        // console.log('this.score',this.score)
+      this.results = true;
     },
 
     nextQuestion(){
@@ -236,10 +130,11 @@ export default {
           //exclude
           this.content = ''
           this.answer = ''
-          this.checkResult()
+          let results = this.questions.filter(res=> res.correct_answer == res.user_answer)
+          this.score = results.length
           return false
         }else{
-          this.createContent()     
+          // this.createContent()     
           this.answer = ''
         }
       }else if(this.questions.length == this.editedIndex){
@@ -258,6 +153,7 @@ export default {
     },  
 
     async allSet(){
+      this.results = false
       this.loading = true
       this.questions = ''
       this.score = ''
@@ -268,7 +164,6 @@ export default {
         }else if(!this.amount || !this.category || !this.difficulty || !this.type){
           alert('Please complete all fields!')
         }else{
-          this.questions = ''
           await axios.get(`https://opentdb.com/api.php?amount=${this.amount}&category=${this.category}&difficulty=${this.difficulty}&type=${this.type}`)
           .then(async (res) => {
             let newArray = await res.data.results.filter((item)=>{
@@ -283,7 +178,7 @@ export default {
             })
 
             this.questions = newArray
-            this.createContent()
+            // this.createContent()
 
           })
           .catch((err)=>{
@@ -300,59 +195,59 @@ export default {
       console.log('event',event,'answer',this.answer)
       this.answer = event;
     },
-    createContent(){
-      if(this.questions[this.editedIndex].choices.length == 2){
-        this.content = `
-          <center>
-          <table> 
-              <tr>
-                <th colspan="12" style="border: 1px solid black; height: 20%;">QUESTION ${this.editedIndex + 1} : ${this.formattedQuestion(this.questions[this.editedIndex].question)}</th>
-              </tr>
-              <tr>
-                <td colspan="6" style=" border: 1px solid black"> 
-                  <input type="radio" id="answerA" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[0]}">
-                  <label for="answerA"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[0]) } </label>
-                </td>
-                <td colspan="6" style=" border: 1px solid black">
-                  <input type="radio" id="answerB" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[1]}">
-                  <label for="answerB"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[1]) } </label>
-                </td>
-              </tr>
-          </table>
-        </center>
-          `
-      }else if(this.questions[this.editedIndex].choices.length > 2){
-        this.content = `
-          <center>
-          <table> 
-              <tr>
-                <th colspan="12" style="border: 1px solid black; height: auto;">QUESTION ${this.editedIndex + 1} : ${this.formattedQuestion(this.questions[this.editedIndex].question)}</th>
-              </tr>
-              <tr>
-                <td colspan="6" style=" border: 1px solid black"> 
-                  <input type="radio" id="answerA" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[0]}">
-                  <label for="answerA"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[0]) } </label>
-                </td>
-                <td colspan="6" style=" border: 1px solid black">
-                  <input type="radio" id="answerB" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[1]}">
-                  <label for="answerB"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[1]) } </label>
-                </td>
-              </tr>
-              <tr>
-                <td colspan="6" style=" border: 1px solid black"> 
-                  <input type="radio" id="answerC" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[2]}">
-                  <label for="answerC"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[2]) } </label>
-                </td>
-                <td colspan="6" style=" border: 1px solid black">
-                  <input type="radio" id="answerD" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[3]}">
-                  <label for="answerD"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[3]) } </label>
-                </td>
-              </tr>
-          </table>
-        </center>
-          `
-      }
-    },
+    // createContent(){
+    //   if(this.questions[this.editedIndex].choices.length == 2){
+    //     this.content = `
+    //       <center>
+    //       <table> 
+    //           <tr>
+    //             <th colspan="12" style="border: 1px solid black; height: 20%;">QUESTION ${this.editedIndex + 1} : ${this.formattedQuestion(this.questions[this.editedIndex].question)}</th>
+    //           </tr>
+    //           <tr>
+    //             <td colspan="6" style=" border: 1px solid black"> 
+    //               <input type="radio" id="answerA" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[0]}">
+    //               <label for="answerA"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[0]) } </label>
+    //             </td>
+    //             <td colspan="6" style=" border: 1px solid black">
+    //               <input type="radio" id="answerB" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[1]}">
+    //               <label for="answerB"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[1]) } </label>
+    //             </td>
+    //           </tr>
+    //       </table>
+    //     </center>
+    //       `
+    //   }else if(this.questions[this.editedIndex].choices.length > 2){
+    //     this.content = `
+    //       <center>
+    //       <table> 
+    //           <tr>
+    //             <th colspan="12" style="border: 1px solid black; height: auto;">QUESTION ${this.editedIndex + 1} : ${this.formattedQuestion(this.questions[this.editedIndex].question)}</th>
+    //           </tr>
+    //           <tr>
+    //             <td colspan="6" style=" border: 1px solid black"> 
+    //               <input type="radio" id="answerA" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[0]}">
+    //               <label for="answerA"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[0]) } </label>
+    //             </td>
+    //             <td colspan="6" style=" border: 1px solid black">
+    //               <input type="radio" id="answerB" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[1]}">
+    //               <label for="answerB"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[1]) } </label>
+    //             </td>
+    //           </tr>
+    //           <tr>
+    //             <td colspan="6" style=" border: 1px solid black"> 
+    //               <input type="radio" id="answerC" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[2]}">
+    //               <label for="answerC"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[2]) } </label>
+    //             </td>
+    //             <td colspan="6" style=" border: 1px solid black">
+    //               <input type="radio" id="answerD" v-model="answer" name="answer" :value="${this.questions[this.editedIndex].choices[3]}">
+    //               <label for="answerD"> ${ this.formattedQuestion(this.questions[this.editedIndex].choices[3]) } </label>
+    //             </td>
+    //           </tr>
+    //       </table>
+    //     </center>
+    //       `
+    //   }
+    // },
     shuffle(array) {
       let currentIndex = array.length,  randomIndex;
 
@@ -397,14 +292,6 @@ export default {
       return event.returnValue = "Are you sure you want to exit?"
     };
     window.addEventListener("beforeunload",beforeUnloadListener, {capture: true})
-
-    // this.particlesInit = async engine => {
-    //     await loadFull(engine);
-    //     // await loadSlim(engine);
-    // };
-    // this.particlesLoaded = async container => {
-    //     console.log("Particles container loaded", container);
-    // };
   },
 
 }
