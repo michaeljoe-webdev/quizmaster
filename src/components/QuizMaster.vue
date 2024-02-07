@@ -36,28 +36,28 @@
         <center>
           <table v-if="questions && questions.length > editedIndex && results == false"> 
               <tr>
-                <th colspan="12" style="border: 1px solid black;text-align: center; height: 95px;">QUESTION {{editedIndex + 1}} : {{ formattedQuestion(questions[editedIndex].question) }}</th>
+                <th colspan="12" style="background-color: beige; border: 1px dashed black;text-align: center; height: 95px;">QUESTION {{editedIndex + 1}} : {{ formattedQuestion(questions[editedIndex].question) }}</th>
               </tr>
               <tr>
-                <td colspan="6" style=" border: 1px solid black; height: 30px; flex-wrap: wrap;"> 
+                <td colspan="6" style="background-color: rgb(255, 255, 243); border: 1px dashed black; height: 30px; flex-wrap: wrap;"> 
                   <input type="radio" id="answerA" v-model="answer" name="answer" :value="questions[editedIndex].choices[0]">
                   <label for="answerA"> <a v-if="questions[editedIndex].choices.length > 2">A.</a> {{ formattedQuestion(questions[editedIndex].choices[0]) }} </label>
                 </td>
               </tr>
               <tr>
-                <td colspan="6" style=" border: 1px solid black; height: 30px; flex-wrap: wrap;">
+                <td colspan="6" style="background-color: rgb(255, 255, 243); border: 1px dashed black; height: 30px; flex-wrap: wrap;">
                   <input type="radio" id="answerB" v-model="answer" name="answer" :value="questions[editedIndex].choices[1]">
                   <label for="answerB"> <a v-if="questions[editedIndex].choices.length > 2">B.</a> {{ formattedQuestion(questions[editedIndex].choices[1]) }} </label>
                 </td>
               </tr>
               <tr v-if="questions[editedIndex].choices.length > 2">
-                <td colspan="6" style=" border: 1px solid black; height: 30px; flex-wrap: wrap;"> 
+                <td colspan="6" style="background-color: rgb(255, 255, 243); border: 1px dashed black; height: 30px; flex-wrap: wrap;"> 
                   <input type="radio" id="answerC" v-model="answer" name="answer" :value="questions[editedIndex].choices[2]">
                   <label for="answerC"> <a>C.</a> {{ formattedQuestion(questions[editedIndex].choices[2]) }} </label>
                 </td>
               </tr>
               <tr v-if="questions[editedIndex].choices.length > 2">
-                <td colspan="6" style=" border: 1px solid black; height: 30px; flex-wrap: wrap;">
+                <td colspan="6" style="background-color: rgb(255, 255, 243); border: 1px dashed black; height: 30px; flex-wrap: wrap;">
                   <input type="radio" id="answerD" v-model="answer" name="answer" :value="questions[editedIndex].choices[3]">
                   <label for="answerC"> <a>D.</a> {{ formattedQuestion(questions[editedIndex].choices[3]) }} </label>
                 </td>
@@ -65,9 +65,9 @@
           </table>
           <table v-if="results == true"> 
               <tr v-for="(item,i) in questions" :key="i">
-                <th colspan="12" style="border: 1px solid black;text-align: center; height: 95px;">QUESTION {{i + 1}} : {{ formattedQuestion(item.question) }}</th>
-                <td colspan="6" style=" border: 1px solid black; height: 30px; flex-wrap: wrap;">Correct Answer : {{ formattedQuestion(item.correct_answer) }}</td>
-                <td colspan="6" style=" border: 1px solid black; height: 30px; flex-wrap: wrap;">Your Answer : {{ formattedQuestion(item.user_answer) }}</td>
+                <th colspan="12" style="background-color: beige; border: 1px solid black;text-align: center; height: 95px;">QUESTION {{i + 1}} : {{ formattedQuestion(item.question) }}</th>
+                <td colspan="6" style="background-color: rgb(143, 253, 107); border: 1px solid black; height: 30px; flex-wrap: wrap;">Correct Answer : {{ formattedQuestion(item.correct_answer) }}</td>
+                <td colspan="6" :style="item.correct_answer == item.user_answer ? 'background-color: rgb(143, 253, 107); border: 1px solid black; height: 30px; flex-wrap: wrap;' : 'background-color: rgb(253, 107, 107); border: 1px solid black; height: 30px; flex-wrap: wrap;'">Your Answer : {{ formattedQuestion(item.user_answer) }}</td>
               </tr>
           </table>
           <div v-if="questions.length == editedIndex && results == false" class="score">
@@ -149,7 +149,7 @@ export default {
       var form = document.getElementById('form');
       form.addEventListener('submit');
       // console.log('test',document.getElementsByName("answer")[0].value)
-      console.log('form',form)
+      // console.log('form',form)
     },  
 
     async allSet(){
@@ -192,7 +192,7 @@ export default {
 
     },  
     handleRadioChange(event) {
-      console.log('event',event,'answer',this.answer)
+      // console.log('event',event,'answer',this.answer)
       this.answer = event;
     },
     // createContent(){
@@ -274,7 +274,7 @@ export default {
     },  
     setLsData(name,value){
       localStorage.setItem(name, JSON.stringify(value));
-      console.log('Successfully Set')
+      // console.log('Successfully Set')
     },
     getLsData(name){
       return JSON.parse(localStorage.getItem(name));
@@ -304,8 +304,7 @@ export default {
 }
 .greeting {
   text-align: center;
-  /* margin-bottom: 15px; */
-  border: 1px solid red;
+  border-radius: 15px;
   text-shadow:  0px 0px 10px aqua,
                 0px 0px 20px aqua,
                 0px 0px 40px aqua,
@@ -321,7 +320,8 @@ export default {
     /* align-content: center; */
     display: flex;
     flex-wrap: wrap;
-    border: 1px solid red;
+    border: 1px dashed grey;
+    background-color: beige;
 
 }
 span {
@@ -329,17 +329,17 @@ span {
 }
 .card {
     height: 250px;
-    border:1px solid red;
+    /* border:1px solid red; */
 }
 .setbtn {
   margin: 5px 5% 5px;
-  border: 1px solid blue;
+  /* border: 1px solid blue; */
 
   
 }
 .nextbtn {
   margin: 5px 5% 5px;
-  border: 1px solid blue;
+  /* border: 1px solid blue; */
 }
 /* TABLE */
 .table {
@@ -347,13 +347,13 @@ span {
   text-align: center;
   align-items: center;
   align-content: center;
-  border: 1px solid yellowgreen;
+  /* border: 1px solid yellowgreen; */
   margin: 10px;
 }
 .questionBox {
   margin: 5px 10%;
   width: 80%;
-  border: 1px solid red;
+  /* border: 1px solid red; */
 
 }
 
