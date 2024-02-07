@@ -3,6 +3,8 @@
       <div class="greeting">
         <h3>{{ msg }}</h3>
       </div>
+      <h6>MichaelJoe4Yuren&Yumi</h6>
+
       <div class="toolbar" >
         <span>
           Number of questions: 
@@ -286,7 +288,7 @@ export default {
       return JSON.parse(localStorage.getItem(name));
     },
     formattedQuestion(string) {
-      return string.replaceAll('&ldquo;', '"').replaceAll('&rdquo;', '"').replaceAll('&quot;', '"').replaceAll('&#039;', "'").replaceAll('&rsquo;', "'").replaceAll('&lsquo;', "'").replaceAll('&shy;', '').replaceAll('&hellip;', '…');
+      return string.replaceAll('&ldquo;', '"').replaceAll('&rdquo;', '"').replaceAll('&quot;', '"').replaceAll('&#039;', "'").replaceAll('&rsquo;', "'").replaceAll('&lsquo;', "'").replaceAll('&shy;', '').replaceAll('&hellip;', '…').replaceAll('&Eacute;', 'É').replaceAll('&eacute;', 'é');
     },
   },
   
@@ -315,6 +317,10 @@ export default {
                 0px 0px 20px aqua,
                 0px 0px 40px aqua,
                 0px 0px 80px aqua;
+  /* border: 1px solid blue; */
+  height: 25px;
+  margin-top: 15px;
+  margin-bottom: -15px;
 
 }
 .toolbar {
