@@ -28,7 +28,8 @@
         </span>
       </div>
       <div class="setbtn">
-        <button @click="allSet()" v-if="results == false">ALL SET!</button>
+        <button @click="allSet()" v-if="results == false && questions == ''">ALL SET!</button>
+        <button @click="allSet()" v-if="results == false && questions != ''">REFRESH</button>
         <button @click="allSet()" v-if="results == true">TRY AGAIN!</button>
       </div>
       <div class="loader" v-if="loading"></div>
@@ -59,15 +60,20 @@
               <tr v-if="questions[editedIndex].choices.length > 2">
                 <td colspan="6" style="background-color: rgb(255, 255, 243); border: 1px dashed black; height: 30px; flex-wrap: wrap;">
                   <input type="radio" id="answerD" v-model="answer" name="answer" :value="questions[editedIndex].choices[3]">
-                  <label for="answerC"> <a>D.</a> {{ formattedQuestion(questions[editedIndex].choices[3]) }} </label>
+                  <label for="answerD"> <a>D.</a> {{ formattedQuestion(questions[editedIndex].choices[3]) }} </label>
                 </td>
               </tr>
           </table>
           <table v-if="results == true"> 
+              <tr>
+                <th colspan="12" style="background-color: beige; border: 1px dashed black;text-align: center; height: 20px;">Questions</th>
+                <th colspan="6" style="background-color: beige; border: 1px dashed black;text-align: center; height: 20px;">Correct Answer</th>
+                <th colspan="6" style="background-color: beige; border: 1px dashed black;text-align: center; height: 20px;">Your Answer</th>
+              </tr>
               <tr v-for="(item,i) in questions" :key="i">
-                <th colspan="12" style="background-color: beige; border: 1px solid black;text-align: center; height: 95px;">QUESTION {{i + 1}} : {{ formattedQuestion(item.question) }}</th>
-                <td colspan="6" style="background-color: rgb(143, 253, 107); border: 1px solid black; height: 30px; flex-wrap: wrap;">Correct Answer : {{ formattedQuestion(item.correct_answer) }}</td>
-                <td colspan="6" :style="item.correct_answer == item.user_answer ? 'background-color: rgb(143, 253, 107); border: 1px solid black; height: 30px; flex-wrap: wrap;' : 'background-color: rgb(253, 107, 107); border: 1px solid black; height: 30px; flex-wrap: wrap;'">Your Answer : {{ formattedQuestion(item.user_answer) }}</td>
+                <th colspan="12" style="background-color: rgb(255, 255, 243); border: 1px dashed black;text-align: center; height: 95px;">{{i + 1}}. {{ formattedQuestion(item.question) }}</th>
+                <td colspan="6" style="background-color: rgb(143, 253, 107); border: 1px dashed black; height: 30px; flex-wrap: wrap;">{{ formattedQuestion(item.correct_answer) }}</td>
+                <td colspan="6" :style="item.correct_answer == item.user_answer ? 'background-color: rgb(143, 253, 107); border: 1px dashed black; height: 30px; flex-wrap: wrap;' : 'background-color: rgb(253, 107, 107); border: 1px dashed black; height: 30px; flex-wrap: wrap;'">{{ formattedQuestion(item.user_answer) }}</td>
               </tr>
           </table>
           <div v-if="questions.length == editedIndex && results == false" class="score">
