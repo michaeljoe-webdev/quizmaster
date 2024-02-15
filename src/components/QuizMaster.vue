@@ -74,8 +74,8 @@
               </tr>
               <tr v-for="(item,i) in questions" :key="i">
                 <th colspan="12" style="background-color: rgb(255, 255, 243); border: 1px dashed black;text-align: center; height: 95px;">{{i + 1}}. {{ formattedQuestion(item.question) }}</th>
-                <td colspan="6" style="background-color: rgb(143, 253, 107); border: 1px dashed black; height: 30px; flex-wrap: wrap;">{{ formattedQuestion(item.correct_answer) }}</td>
-                <td colspan="6" :style="item.correct_answer == item.user_answer ? 'background-color: rgb(143, 253, 107); border: 1px dashed black; height: 30px; flex-wrap: wrap;' : 'background-color: rgb(253, 107, 107); border: 1px dashed black; height: 30px; flex-wrap: wrap;'">{{ formattedQuestion(item.user_answer) }}</td>
+                <td colspan="6" style="background-color: rgb(143, 253, 107); border: 1px dashed black;text-align: center; height: 30px; flex-wrap: wrap;">{{ formattedQuestion(item.correct_answer) }}</td>
+                <td colspan="6" :style="item.correct_answer == item.user_answer ? 'background-color: rgb(143, 253, 107); border: 1px dashed black;text-align: center; height: 30px; flex-wrap: wrap;' : 'background-color: rgb(253, 107, 107); border: 1px dashed black;text-align: center; height: 30px; flex-wrap: wrap;'">{{ formattedQuestion(item.user_answer) }}</td>
               </tr>
           </table>
           <div v-if="questions.length == editedIndex && results == false" class="score">
